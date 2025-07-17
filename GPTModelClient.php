@@ -15,9 +15,10 @@ use Symfony\AI\Platform\Bridge\OpenAI\GPT;
 use Symfony\AI\Platform\Exception\InvalidArgumentException;
 use Symfony\AI\Platform\Model;
 use Symfony\AI\Platform\ModelClientInterface;
+use Symfony\AI\Platform\Response\RawHttpResponse;
+use Symfony\AI\Platform\Response\RawResponseInterface;
 use Symfony\Component\HttpClient\EventSourceHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
@@ -42,11 +43,11 @@ final readonly class GPTModelClient implements ModelClientInterface
         return $model instanceof GPT;
     }
 
-    public function request(Model $model, array|string $payload, array $options = []): ResponseInterface
+    public function request(Model $model, array|string $payload, array $options = []): RawResponseInterface
     {
-        return $this->httpClient->request('POST', \sprintf('%s/chat/completions', $this->baseUrl), [
+        return new RawHttpResponse($this->httpClient->request('POST', \sprintf('%s/chat/completions', $this->baseUrl), [
             'auth_bearer' => $this->apiKey,
             'json' => \is_array($payload) ? array_merge($payload, $options) : $payload,
-        ]);
+        ]));
     }
 }
