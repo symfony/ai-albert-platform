@@ -11,7 +11,7 @@
 
 namespace Symfony\AI\Platform\Bridge\Albert;
 
-use Symfony\AI\Platform\Bridge\OpenAI\Embeddings;
+use Symfony\AI\Platform\Bridge\OpenAi\Embeddings;
 use Symfony\AI\Platform\Exception\InvalidArgumentException;
 use Symfony\AI\Platform\Model;
 use Symfony\AI\Platform\ModelClientInterface;
