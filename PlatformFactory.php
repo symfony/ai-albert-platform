@@ -32,6 +32,7 @@ final class PlatformFactory
         str_starts_with($baseUrl, 'https://') || throw new InvalidArgumentException('The Albert URL must start with "https://".');
         !str_ends_with($baseUrl, '/') || throw new InvalidArgumentException('The Albert URL must not end with a trailing slash.');
         preg_match('/\/v\d+$/', $baseUrl) || throw new InvalidArgumentException('The Albert URL must include an API version (e.g., /v1, /v2).');
+        '' !== $apiKey || throw new InvalidArgumentException('The API key must not be empty.');
 
         $httpClient = $httpClient instanceof EventSourceHttpClient ? $httpClient : new EventSourceHttpClient($httpClient);
 
