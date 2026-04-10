@@ -11,10 +11,13 @@
 
 namespace Symfony\AI\Platform\Bridge\Albert;
 
-use Symfony\AI\Platform\Bridge\Generic\PlatformFactory as GenericPlatformFactory;
+use Symfony\AI\Platform\Bridge\Generic\Factory as GenericFactory;
 use Symfony\AI\Platform\Exception\InvalidArgumentException;
 use Symfony\AI\Platform\ModelCatalog\ModelCatalogInterface;
+use Symfony\AI\Platform\ModelRouter\CatalogBasedModelRouter;
+use Symfony\AI\Platform\ModelRouterInterface;
 use Symfony\AI\Platform\Platform;
+use Symfony\AI\Platform\ProviderInterface;
 use Symfony\Component\HttpClient\EventSourceHttpClient;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -22,15 +25,19 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
-final class PlatformFactory
+final class Factory
 {
-    public static function create(
+    /**
+     * @param non-empty-string $name
+     */
+    public static function createProvider(
         #[\SensitiveParameter] string $apiKey,
         string $baseUrl,
         ?HttpClientInterface $httpClient = null,
         ModelCatalogInterface $modelCatalog = new ModelCatalog(),
         ?EventDispatcherInterface $eventDispatcher = null,
-    ): Platform {
+        string $name = 'albert',
+    ): ProviderInterface {
         if (!str_starts_with($baseUrl, 'https://')) {
             throw new InvalidArgumentException('The Albert URL must start with "https://".');
         }
@@ -46,7 +53,7 @@ final class PlatformFactory
 
         $httpClient = $httpClient instanceof EventSourceHttpClient ? $httpClient : new EventSourceHttpClient($httpClient);
 
-        return GenericPlatformFactory::create(
+        return GenericFactory::createProvider(
             baseUrl: $baseUrl,
             apiKey: $apiKey,
             httpClient: $httpClient,
@@ -54,6 +61,26 @@ final class PlatformFactory
             eventDispatcher: $eventDispatcher,
             completionsPath: '/chat/completions',
             embeddingsPath: '/embeddings',
+            name: $name,
+        );
+    }
+
+    /**
+     * @param non-empty-string $name
+     */
+    public static function createPlatform(
+        #[\SensitiveParameter] string $apiKey,
+        string $baseUrl,
+        ?HttpClientInterface $httpClient = null,
+        ModelCatalogInterface $modelCatalog = new ModelCatalog(),
+        ?EventDispatcherInterface $eventDispatcher = null,
+        string $name = 'albert',
+        ?ModelRouterInterface $modelRouter = null,
+    ): Platform {
+        return new Platform(
+            [self::createProvider($apiKey, $baseUrl, $httpClient, $modelCatalog, $eventDispatcher, $name)],
+            $modelRouter ?? new CatalogBasedModelRouter(),
+            $eventDispatcher,
         );
     }
 }

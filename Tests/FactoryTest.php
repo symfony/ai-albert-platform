@@ -13,15 +13,15 @@ namespace Symfony\AI\Platform\Bridge\Albert\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\AI\Platform\Bridge\Albert\PlatformFactory;
+use Symfony\AI\Platform\Bridge\Albert\Factory;
 use Symfony\AI\Platform\Exception\InvalidArgumentException;
 use Symfony\AI\Platform\Platform;
 
-final class PlatformFactoryTest extends TestCase
+final class FactoryTest extends TestCase
 {
     public function testCreatesPlatformWithCorrectBaseUrl()
     {
-        $platform = PlatformFactory::create('test-key', 'https://albert.example.com/v1');
+        $platform = Factory::createPlatform('test-key', 'https://albert.example.com/v1');
 
         $this->assertInstanceOf(Platform::class, $platform);
     }
@@ -29,7 +29,7 @@ final class PlatformFactoryTest extends TestCase
     #[DataProvider('provideValidUrls')]
     public function testHandlesUrlsCorrectly(string $url)
     {
-        $platform = PlatformFactory::create('test-key', $url);
+        $platform = Factory::createPlatform('test-key', $url);
 
         $this->assertInstanceOf(Platform::class, $platform);
     }
@@ -48,7 +48,7 @@ final class PlatformFactoryTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The Albert URL must start with "https://".');
 
-        PlatformFactory::create('test-key', 'http://albert.example.com');
+        Factory::createPlatform('test-key', 'http://albert.example.com');
     }
 
     public function testPlatformThrowsExceptionForEmptyApiKey()
@@ -56,7 +56,7 @@ final class PlatformFactoryTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The API key must not be empty.');
 
-        PlatformFactory::create('', 'https://albert.example.com/v2');
+        Factory::createPlatform('', 'https://albert.example.com/v2');
     }
 
     #[DataProvider('provideUrlsWithTrailingSlash')]
@@ -65,7 +65,7 @@ final class PlatformFactoryTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The Albert URL must not end with a trailing slash.');
 
-        PlatformFactory::create('test-key', $url);
+        Factory::createPlatform('test-key', $url);
     }
 
     public static function provideUrlsWithTrailingSlash(): \Iterator
@@ -81,7 +81,7 @@ final class PlatformFactoryTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The Albert URL must include an API version (e.g., /v1, /v2).');
 
-        PlatformFactory::create('test-key', $url);
+        Factory::createPlatform('test-key', $url);
     }
 
     public static function provideUrlsWithoutVersion(): \Iterator
