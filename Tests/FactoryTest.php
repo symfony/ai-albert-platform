@@ -60,19 +60,18 @@ final class FactoryTest extends TestCase
     }
 
     #[DataProvider('provideUrlsWithTrailingSlash')]
-    public function testThrowsExceptionForUrlsWithTrailingSlash(string $url)
+    public function testToleratesTrailingSlashes(string $url)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The Albert URL must not end with a trailing slash.');
+        $platform = Factory::createPlatform('test-key', $url);
 
-        Factory::createPlatform('test-key', $url);
+        $this->assertInstanceOf(Platform::class, $platform);
     }
 
     public static function provideUrlsWithTrailingSlash(): \Iterator
     {
-        yield 'with trailing slash only' => ['https://albert.example.com/'];
         yield 'with v1 and trailing slash' => ['https://albert.example.com/v1/'];
         yield 'with v2 and trailing slash' => ['https://albert.example.com/v2/'];
+        yield 'with multiple trailing slashes' => ['https://albert.example.com/v1///'];
     }
 
     #[DataProvider('provideUrlsWithoutVersion')]
@@ -87,6 +86,7 @@ final class FactoryTest extends TestCase
     public static function provideUrlsWithoutVersion(): \Iterator
     {
         yield 'without version' => ['https://albert.example.com'];
+        yield 'with trailing slash only' => ['https://albert.example.com/'];
         yield 'with vx path' => ['https://albert.example.com/vx'];
         yield 'with version path' => ['https://albert.example.com/version'];
         yield 'with api path' => ['https://albert.example.com/api'];

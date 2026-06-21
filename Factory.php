@@ -38,11 +38,10 @@ final class Factory
         ?EventDispatcherInterface $eventDispatcher = null,
         string $name = 'albert',
     ): ProviderInterface {
+        $baseUrl = rtrim($baseUrl, '/');
+
         if (!str_starts_with($baseUrl, 'https://')) {
             throw new InvalidArgumentException('The Albert URL must start with "https://".');
-        }
-        if (str_ends_with($baseUrl, '/')) {
-            throw new InvalidArgumentException('The Albert URL must not end with a trailing slash.');
         }
         if (!preg_match('/\/v\d+$/', $baseUrl)) {
             throw new InvalidArgumentException('The Albert URL must include an API version (e.g., /v1, /v2).');

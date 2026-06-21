@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.11
+----
+
+ * Tolerate a trailing slash on the base URL instead of rejecting it
+
 0.8
 ---
 
